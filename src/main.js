@@ -1,31 +1,48 @@
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
 
-const galleryContainer = document.querySelector('.gallery');
-const loader = document.getElementById('loader');
-let lightbox;
+import { fetchImages } from './js/pixabay-api';
+import { createGallery, clearGallery } from './js/render-functions';
 
-export function createGallery(images) {
-  const markup = images.map(img =>
-    `<a href="${img.largeImageURL}" class="gallery-item">
-       <img src="${img.webformatURL}" alt="${img.tags}" loading="lazy" />
-     </a>`
-  ).join('');
 
-  galleryContainer.insertAdjacentHTML('beforeend', markup);
+const formEl = document.querySelector('.form');
 
-  lightbox = new SimpleLightbox('.gallery a');
-  lightbox.refresh();
-}
+formEl.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const query = e.currentTarget.elements.searchQuery.value.trim();
+  if (!query) return;
 
-export function clearGallery() {
-  galleryContainer.innerHTML = '';
-}
+  clearGallery(); // очищення галереї
 
-export function showLoader() {
-  loader.hidden = false;
-}
+  try {
+    const data = await fetchImages(query);
+    if (data.hits.length === 0) {
+      iziToast.info({
+        message: 'Sorry, no images found!',
+      });
+      return;
+    }
+    createGallery(data.hits);
+  } catch (error) {
+    iziToast.error({ message: 'Error loading images' });
+  }
+});
 
-export function hideLoader() {
-  loader.hidden = true;
-}
+formEl.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const query = e.currentTarget.elements.searchQuery.value.trim();
+  if (!query) return;
+
+  clearGallery(); // очищення галереї
+
+  try {
+    const data = await fetchImages(query);
+    if (data.hits.length === 0) {
+      iziToast.info({
+        message: 'Sorry, no images found!',
+      });
+      return;
+    }
+    createGallery(data.hits);
+  } catch (error) {
+    iziToast.error({ message: 'Error loading images' });
+  }
+});
