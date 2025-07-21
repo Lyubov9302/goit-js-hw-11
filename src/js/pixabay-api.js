@@ -3,7 +3,7 @@ import axios from 'axios';
 const API_KEY = '51359701-f6006c27d1fc3647654901390';
 const BASE_URL = 'https://pixabay.com/api/';
 
-export async function fetchImages(query) {
+export async function getImagesByQuery(query) {
   const params = {
     key: API_KEY,
     q: query,
@@ -13,5 +13,5 @@ export async function fetchImages(query) {
   };
 
   const response = await axios.get(BASE_URL, { params });
-  return response.data;
+  return response.data.hits;
 }

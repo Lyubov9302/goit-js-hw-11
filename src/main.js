@@ -1,48 +1,35 @@
+import { getImagesByQuery } from './js/pixabay-api.js';
+import { createGallery, clearGallery, showLoader, hideLoader } from './js/render-functions.js';
+import iziToast from 'izitoast';
+import 'izitoast/dist/css/iziToast.min.css';
 
-import { fetchImages } from './js/pixabay-api';
-import { createGallery, clearGallery } from './js/render-functions';
+const form = document.querySelector('.form');
+const input = form.elements['search-text'];
 
-
-const formEl = document.querySelector('.form');
-
-formEl.addEventListener('submit', async (e) => {
+form.addEventListener('submit', async e => {
   e.preventDefault();
-  const query = e.currentTarget.elements.searchQuery.value.trim();
-  if (!query) return;
+  const query = input.value.trim();
 
-  clearGallery(); // очищення галереї
-
-  try {
-    const data = await fetchImages(query);
-    if (data.hits.length === 0) {
-      iziToast.info({
-        message: 'Sorry, no images found!',
-      });
-      return;
-    }
-    createGallery(data.hits);
-  } catch (error) {
-    iziToast.error({ message: 'Error loading images' });
+  if (!query) {
+    iziToast.warning({ message: 'Введи ключове слово для пошуку!', position: 'topRight' });
+    return;
   }
-});
 
-formEl.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const query = e.currentTarget.elements.searchQuery.value.trim();
-  if (!query) return;
-
-  clearGallery(); // очищення галереї
+  clearGallery();
+  showLoader();
 
   try {
-    const data = await fetchImages(query);
-    if (data.hits.length === 0) {
-      iziToast.info({
-        message: 'Sorry, no images found!',
-      });
-      return;
+    const images = await getImagesByQuery(query);
+
+    if (images.length === 0) {
+      iziToast.info({ message: 'Нічого не знайдено за цим запитом.', position: 'topRight' });
+    } else {
+      createGallery(images);
     }
-    createGallery(data.hits);
   } catch (error) {
-    iziToast.error({ message: 'Error loading images' });
+    iziToast.error({ message: 'Помилка при завантаженні зображень!', position: 'topRight' });
+    console.error(error);
+  } finally {
+    hideLoader();
   }
 });
