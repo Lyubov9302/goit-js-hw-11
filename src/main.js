@@ -4,16 +4,13 @@ import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 
 const form = document.querySelector('.form');
-const input = form.elements['search-text'];
+const input = document.querySelector('input[name="search-text"]');
 
-form.addEventListener('submit', async e => {
+form.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const query = input.value.trim();
 
-  if (!query) {
-    iziToast.warning({ message: 'Введи ключове слово для пошуку!', position: 'topRight' });
-    return;
-  }
+  const query = input.value.trim();
+  if (!query) return;
 
   clearGallery();
   showLoader();
