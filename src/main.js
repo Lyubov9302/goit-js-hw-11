@@ -10,7 +10,13 @@ form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const query = input.value.trim();
-  if (!query) return;
+  if (!query) {
+    iziToast.warning({
+      title: 'Увага!',
+      message: 'Введіть запит для пошуку зображень',
+      position: 'topRight',
+    });
+  } return;
 
   clearGallery();
   showLoader();
